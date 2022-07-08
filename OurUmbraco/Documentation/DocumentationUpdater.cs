@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -14,7 +15,7 @@ namespace OurUmbraco.Documentation
     {
         private const string DocumentationFolder = @"~\Documentation";
         private readonly string _rootFolderPath = HostingEnvironment.MapPath(DocumentationFolder);
-        
+
         /// <summary>
         /// This will ensure that the docs exist, this checks by the existence of the /Documentation/sitemap.js file
         /// </summary>
@@ -35,7 +36,26 @@ namespace OurUmbraco.Documentation
             else
             {
                 // clone if the repo doesn't yet exist
-                LibGit2Sharp.Repository.Clone("https://github.com/umbraco/UmbracoDocs", _rootFolderPath);
+                var gitRepo = ConfigurationManager.AppSettings["Documentation:gitRepo"];
+                if (string.IsNullOrEmpty(gitRepo))
+                {
+                    gitRepo = "https://github.com/umbraco/UmbracoDocs";
+                }
+
+                var branchName = ConfigurationManager.AppSettings["Documentation:gitRepo:Branch"];
+                if (!string.IsNullOrEmpty(branchName))
+                {
+                    var options = new CloneOptions()
+                    {
+                        BranchName = branchName
+                    };
+                    LibGit2Sharp.Repository.Clone(gitRepo, _rootFolderPath, options);
+                }
+                else
+                {
+                    LibGit2Sharp.Repository.Clone(gitRepo, _rootFolderPath);
+                }
+
             }
 
             BuildSitemap(_rootFolderPath);
@@ -79,7 +99,7 @@ namespace OurUmbraco.Documentation
 
             const string regexPattern = @"(\d*sort-)";
             var regex = new Regex(regexPattern);
-            
+
             var siteMapItem = new SiteMapItem
             {
                 Name = Regex.Replace(dir.Name, regexPattern, "").Replace("-", " "),
@@ -144,7 +164,7 @@ namespace OurUmbraco.Documentation
                             return 4;
                         case "getting-started/where-can-i-get-help":
                             return 5;
-                            
+
                         //Fundamentals
                         case "fundamentals/setup":
                             return 0;
@@ -224,7 +244,7 @@ namespace OurUmbraco.Documentation
                             return 18;
                         case "reference/using-ioc":
                             return 19;
-                        
+
                         //Tutorials
                         case "tutorials/creating-basic-site":
                             return 0;
@@ -262,7 +282,7 @@ namespace OurUmbraco.Documentation
                             return 5;
                         case "umbraco-cloud/frequently-asked-questions":
                             return 6;
-                        
+
                         //Umbraco Heartcore
                         case "umbraco-heartcore/getting-started-cloud":
                             return 0;
@@ -401,13 +421,13 @@ namespace OurUmbraco.Documentation
                             return 3;
                         case "routing/webapi":
                             return 4;
-                        
+
                         //Reference - Events
                         case "events/editormodel-events":
                             return 0;
                         case "events/memberservice-events":
                             return 1;
-                            
+
                         //Tutorials - Basic site from scratch
                         case "creating-basic-site/getting-started":
                             return 0;
@@ -431,7 +451,7 @@ namespace OurUmbraco.Documentation
                             return 9;
                         case "creating-basic-site/conclusions-where-next":
                             return 10;
-                            
+
                         //Tutorials - Editor Manual
                         case "editors-manual/getting-started-with-umbraco":
                             return 0;
@@ -452,9 +472,9 @@ namespace OurUmbraco.Documentation
                         case "umbracoforms/developer":
                             return 2;
 
-                       //Add ons - Umbraco Deploy
+                        //Add ons - Umbraco Deploy
                         case "umbraco-deploy/get-started-with-deploy":
-                            return 0; 
+                            return 0;
                         case "umbraco-deploy/installing-deploy":
                             return 1;
                         case "umbraco-deploy/deployment-workflow":
