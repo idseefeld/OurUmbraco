@@ -4,6 +4,12 @@
     var docsUpdater = new DocumentationUpdater();
     var sitemap = docsUpdater.DocumentationSiteMap();
     const string root = "/documentation";
+    var language = GetLanguage();
+    if (!string.IsNullOrEmpty(language))
+    {
+        var languageDirectors = sitemap.Directories.FirstOrDefault(d => d.Level == 1 && d.Name.ToLower() == language);
+        sitemap.Directories = languageDirectors.Directories;
+    }
 }
 
 @functions
@@ -11,7 +17,7 @@
     public static string IsActive(string path, string classname = "active")
     {
         var requestSegments = HttpContext.Current.Request.Url.Segments.Skip(1);
-        var itemSegments = path.Split(new[] {"/"}, StringSplitOptions.RemoveEmptyEntries);
+        var itemSegments = path.Split(new[] { "/" }, StringSplitOptions.RemoveEmptyEntries);
         var counter = 0;
         foreach (var requestSegment in requestSegments.Take(itemSegments.Length))
         {
@@ -24,10 +30,36 @@
 
         return counter == itemSegments.Length ? classname : string.Empty;
     }
+    public static string GetLanguage()
+    {
+        var rVal = string.Empty;
+        var requestSegments = HttpContext.Current.Request.Url.Segments.Skip(1);
+        if (requestSegments.Count() > 1)
+        {
+            var language = requestSegments.ElementAt(1).Trim("/").ToLower();
+            if (language == "de")
+            {
+                rVal = language;
+            }
+        }
+        return rVal;
+    }
+    public string RemoveNumberPrefix(string name)
+    {
+        var rVal = name;
+        if (name.StartsWith("0") || name.StartsWith("1") || name.StartsWith("2"))
+        {
+            rVal = name.Substring(3);
+        }
+        return rVal;
+    }
 }
 
 
 <nav>
+    <div id="language">
+        <a href="/documentation">EN</a> | <a href="/documentation/de">DE</a>
+    </div>
     <details class="secondary_nav" open>
         <summary>Menu</summary>
         <ul class="level-1">
@@ -39,10 +71,12 @@
                     && item.Name != "Using Umbraco"
                     && item.Name != "Installation"
                     && item.Name != "Products"
-                    && item.Name != "Cheatsheets")
+                    && item.Name != "Cheatsheets"
+                    && item.Name != "DE"
+                    && !item.Name.StartsWith("x "))
                 {
                     <li class=" @IsActive(root+item.Path, "active open")">
-                        <a href="@(root + item.Path)/"><h3>@item.Name</h3></a>
+                        <a href="@(root + item.Path)/"><h3>@RemoveNumberPrefix(item.Name)</h3></a>
 
                         @if (item.HasChildren)
                         {
