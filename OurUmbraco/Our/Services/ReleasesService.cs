@@ -92,6 +92,7 @@ namespace OurUmbraco.Our.Services
             var releasesPageNodeId = int.Parse(ConfigurationManager.AppSettings["uReleaseParentNodeId"]);
             var umbracoHelper = new UmbracoHelper(GetUmbracoContext());
             var releasesNode = umbracoHelper.TypedContent(releasesPageNodeId);
+            if (releasesNode == null) return;
 
             var releaseNodes = releasesNode.Children.ToArray();
             context.WriteLine($"Found {releaseNodes.Length} releases");

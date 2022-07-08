@@ -18,7 +18,8 @@ namespace OurUmbraco.Videos
 
         public void UpdateVimeoVideos(string username)
         {
-            if (ConfigurationManager.AppSettings["VimeoAccessToken"] == "it's a secret.. and no, this is not the secret, this key will transformed on the build server")
+            if (ConfigurationManager.AppSettings["VimeoAccessToken"] == "it's a secret.. and no, this is not the secret, this key will transformed on the build server"
+                || ConfigurationManager.AppSettings["VimeoAccessToken"] == "#{VimeoAccessToken}#")
             {
                 return;
             }
