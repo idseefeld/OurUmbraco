@@ -43,7 +43,7 @@ namespace OurUmbraco.Community.Videos
             string path = dir + "Video_" + videoId + ".json";
             return File.Exists(path) ? JsonUtils.LoadJsonObject(path, YouTubeVideo.Parse) : null;
         }
-        
+
         public Playlist[] GetPlaylists()
         {
             try
@@ -101,11 +101,20 @@ namespace OurUmbraco.Community.Videos
             string dir = IOHelper.MapPath("~/App_Data/TEMP/YouTube/");
             Directory.CreateDirectory(dir);
 
-            // Make an initial request to get information about the playlist
-            var response1 = Api.YouTube.Playlists.GetPlaylists(new YouTubeGetPlaylistListOptions
+            Skybrud.Social.Google.YouTube.Responses.Playlist.YouTubeGetPlaylistListResponse response1 = null;
+            try
             {
-                Ids = new[] { playlistId }
-            });
+                // Make an initial request to get information about the playlist
+                response1 = Api.YouTube.Playlists.GetPlaylists(new YouTubeGetPlaylistListOptions
+                {
+                    Ids = new[] { playlistId }
+                });
+            }
+            catch (Skybrud.Social.Google.YouTube.Exceptions.YouTubeException ex)
+            {
+                LogHelper.Error<CommunityVideosService>(ex.Message, ex);
+                return;
+            }
 
             // Get a reference to the playlist (using "Single" as there should be exactly one playlist)
             var playlist = response1.Body.Items.Single();
