@@ -17,12 +17,23 @@
     }
     var linkToGithubIssue = Github.GithubIssueString();
 }
+@functions{
+    public string RemoveNumberPrefix(string name)
+    {
+        var rVal = name;
+        if (name.StartsWith("0") || name.StartsWith("1") || name.StartsWith("2"))
+        {
+            rVal = name.Substring(3);
+        }
+        return rVal;
+    }
+}
 <div class="utilities">
     <ul id="breadcrumb">
         <li><a href="/">Our</a></li>
         @foreach (var page in strDirs)
         {
-            <li><a href="@(baseurl+page)/">@page.RemoveDash().UnderscoreToDot().EnsureCorrectDocumentationText()</a></li>
+            <li><a href="@(baseurl+page)/">@RemoveNumberPrefix(page.RemoveDash().UnderscoreToDot().EnsureCorrectDocumentationText())</a></li>
             {
                 baseurl += page + "/";
             }
@@ -32,7 +43,7 @@
         {
             if (!absolutePath.EndsWith("/"))
             {
-                <li>@absolutePath.Substring(absolutePath.LastIndexOf('/') + 1).RemoveDash().UnderscoreToDot().EnsureCorrectDocumentationText()</li>
+                <li>@RemoveNumberPrefix(absolutePath.Substring(absolutePath.LastIndexOf('/') + 1).RemoveDash().UnderscoreToDot().EnsureCorrectDocumentationText())</li>
             }
         }
 
