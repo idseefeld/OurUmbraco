@@ -799,6 +799,7 @@
     <Content Include="config\CommunityBlogs.json" />
     <None Include="Media\Web.config" />
     <None Include="packages.config" />
+    <None Include="Properties\PublishProfiles\idseefeld-folder-profile.pubxml" />
     <None Include="Properties\PublishProfiles\Local.pubxml" />
     <Content Include="scripts\amcharts\CHANGELOG.md" />
     <Content Include="scripts\amcharts\LICENSE" />
